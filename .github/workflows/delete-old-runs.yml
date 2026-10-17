@@ -1,4 +1,21 @@
-- name: Delete old workflow runs
-  uses: Alphabet2625/delete-workflow-runs@@v2.1.0
-    token: ${{ github.token }}
-    retain_days: 5
+name: Delete old workflow runs
+on:
+  schedule:
+    - cron: "0 0 1 * *" # 每月1号 UTC 00:00 执行
+  workflow_dispatch: # 同时支持手动触发
+
+jobs:
+  delete-runs:
+    runs-on: ubuntu-latest
+    permissions:
+      actions: write
+      contents: read
+    steps:
+      - name: Delete workflow runs
+        uses: Alphabet2625/delete-workflow-runs@@v2.1.0
+        with:
+          token: ${{ github.token }}
+          repository: ${{ github.repository }}
+          retain_days: 30
+          keep_minimum_runs: 6
+          # dry_run: true  # 首次测试时建议先开启
